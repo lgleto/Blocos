@@ -12,6 +12,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     let kPaddleName : String = "paddle"
     let kBallName   : String = "ball"
+    let kBlockName  : String = "block"
     
     let ballCategory    : UInt32 = 0b0001
     let bottomCategory  : UInt32 = 0b0010
@@ -63,7 +64,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         ball.physicsBody?.applyImpulse(CGVector(dx:2.0, dy:2.0))
         
-       
+        let blockRows : CGFloat = 12
+        let blockColumns : CGFloat = 10
+        let blockWidth = frame.size.width / blockRows
+        let blockHeight = frame.size.height / blockRows / 2.0
+        let yOffset = frame.size.height - blockHeight * 11
+        
+        for i in 0..<Int(blockRows) {
+            for j in 0..<Int(blockColumns){
+                let block = SKShapeNode.init(rect: CGRect(x: 0, y: 0, width: blockWidth, height: blockHeight))
+                block.name=kBlockName
+                block.fillColor=SKColor.red
+                block.position = CGPoint(x: blockWidth*CGFloat(i), y: blockHeight*CGFloat(j) + yOffset )
+                block.physicsBody = SKPhysicsBody.init(rectangleOf: block.frame.size,
+                                                        center: CGPoint(x: block.frame.width/2.0,
+                                                                        y: block.frame.height/2.0 ))
+                block.physicsBody?.restitution=1.0
+                block.physicsBody?.friction=0.0
+                block.physicsBody?.linearDamping=0.0
+                block.physicsBody?.angularDamping=0.0
+                block.physicsBody?.isDynamic = false
+                
+                self.addChild(block)
+            }
+        }
+        
         self.addChild(paddle)
     }
     
@@ -121,5 +146,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         gameOver.horizontalAlignmentMode = .center
         gameOver.position = CGPoint(x: self.frame.size.width/2.0, y: self.frame.size.height/2.0)
         self.addChild(gameOver)
+        
+        for child in self.children {
+            if child.name == kBallName {
+                child.removeFromParent()
+            }
+        }
     }
 }
