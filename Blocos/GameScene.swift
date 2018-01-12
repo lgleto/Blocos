@@ -46,7 +46,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         paddle.physicsBody?.angularDamping=0.0
         paddle.physicsBody?.isDynamic = false
        
-        
         let ball = SKShapeNode.init(circleOfRadius: 8.0)
         ball.name=kBallName
         ball.fillColor=SKColor.red
@@ -74,6 +73,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var isFingerOnThePaddle = false
     
+    // toches on the screen
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first
         let touchLocation = touch?.location(in: self)
@@ -99,7 +99,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         isFingerOnThePaddle=false
     }
     
+    // Collision detection
+    
     func didBegin(_ contact: SKPhysicsContact) {
-        print ("something colide")
+        if contact.bodyA.node?.parent == nil || contact.bodyB.node?.parent == nil{
+            return
+        }
+        
+        // Bottom Ball
+        if contact.bodyA.categoryBitMask == bottomCategory && contact.bodyB.categoryBitMask == ballCategory {
+            gameOver()
+        }else if contact.bodyA.categoryBitMask == ballCategory  && contact.bodyB.categoryBitMask == bottomCategory{
+            gameOver()
+        }
+     }
+    
+    func gameOver(){
+        let gameOver = SKLabelNode.init(text: "Game Over")
+        gameOver.fontSize = 24
+        gameOver.fontColor = SKColor.red
+        gameOver.horizontalAlignmentMode = .center
+        gameOver.position = CGPoint(x: self.frame.size.width/2.0, y: self.frame.size.height/2.0)
+        self.addChild(gameOver)
     }
 }
