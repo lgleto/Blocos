@@ -17,6 +17,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let ballCategory    : UInt32 = 0b0001
     let bottomCategory  : UInt32 = 0b0010
     let paddleCategory  : UInt32 = 0b0100
+    let blockCategory   : UInt32 = 0b1000
 
     override init(size:CGSize) {
         super.init(size: size)
@@ -50,7 +51,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let ball = SKShapeNode.init(circleOfRadius: 8.0)
         ball.name=kBallName
         ball.fillColor=SKColor.red
-        ball.position=CGPoint(x: self.frame.width/2.0, y: self.frame.height/2.0)
+        ball.position=CGPoint(x: self.frame.width/2.0, y: 40.0)
         ball.physicsBody=SKPhysicsBody.init(circleOfRadius: 8.0)
         ball.physicsBody?.restitution=1.0
         ball.physicsBody?.friction=0.0
@@ -84,6 +85,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 block.physicsBody?.linearDamping=0.0
                 block.physicsBody?.angularDamping=0.0
                 block.physicsBody?.isDynamic = false
+                block.physicsBody?.categoryBitMask = blockCategory
+                block.physicsBody?.contactTestBitMask = ballCategory
+
                 
                 self.addChild(block)
             }
@@ -137,7 +141,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }else if contact.bodyA.categoryBitMask == ballCategory  && contact.bodyB.categoryBitMask == bottomCategory{
             gameOver()
         }
+        
+        // Block Ball
+        if contact.bodyA.categoryBitMask == blockCategory
+            && contact.bodyB.categoryBitMask == ballCategory {
+            ballBlockColision(block: contact.bodyA.node!)
+        }else if contact.bodyA.categoryBitMask == ballCategory  && contact.bodyB.categoryBitMask == blockCategory{
+            ballBlockColision(block: contact.bodyB.node!)
+        }
      }
+    
+    func ballBlockColision (block:SKNode){
+        block.removeFromParent()
+    }
     
     func gameOver(){
         let gameOver = SKLabelNode.init(text: "Game Over")
