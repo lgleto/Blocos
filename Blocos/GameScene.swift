@@ -18,6 +18,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let bottomCategory  : UInt32 = 0b0010
     let paddleCategory  : UInt32 = 0b0100
     let blockCategory   : UInt32 = 0b1000
+    
+    var blocksCount = 0
 
     override init(size:CGSize) {
         super.init(size: size)
@@ -66,7 +68,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ball.physicsBody?.applyImpulse(CGVector(dx:2.0, dy:2.0))
         
         let blockRows : CGFloat = 12
-        let blockColumns : CGFloat = 10
+        let blockColumns : CGFloat = 2
         let blockWidth = frame.size.width / blockRows
         let blockHeight = frame.size.height / blockRows / 2.0
         let yOffset = frame.size.height - blockHeight * 11
@@ -88,7 +90,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 block.physicsBody?.categoryBitMask = blockCategory
                 block.physicsBody?.contactTestBitMask = ballCategory
 
-                
+                blocksCount+=1
                 self.addChild(block)
             }
         }
@@ -98,6 +100,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        // Called before each frame is rendered
+        
+        //auto play
+        if let paddle = childNode(withName: kPaddleName){
+            if let ball = childNode(withName: kBallName){
+                paddle.position.x = ball.position.x - paddle.frame.size.width/2.0
+            }
+        }
     }
     
     var isFingerOnThePaddle = false
@@ -112,6 +125,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
+    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if isFingerOnThePaddle{
             let touch = touches.first
@@ -153,6 +167,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func ballBlockColision (block:SKNode){
         block.removeFromParent()
+        blocksCount -= 1
+        
+        if blocksCount == 0 {
+            let transition = SKTransition.flipVertical(withDuration: 0.5)
+            let nextScene = VictoryScene(size:self.frame.size)
+            nextScene.scaleMode = .aspectFit
+            scene?.view?.presentScene(nextScene, transition: transition)
+        }
     }
     
     func gameOver(){
@@ -168,5 +190,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 child.removeFromParent()
             }
         }
+        
+        let transition = SKTransition.flipVertical(withDuration: 0.5)
+        let nextScene = GameOverScene(size:self.frame.size)
+        nextScene.scaleMode = .aspectFit
+        scene?.view?.presentScene(nextScene, transition: transition)
     }
 }

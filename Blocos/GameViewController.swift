@@ -18,10 +18,10 @@ class GameViewController: UIViewController {
         if let view = self.view as! SKView? {
             // Load the SKScene from 'GameScene.sks'
             if view.scene == nil {
-                let gameScene = GameScene(size: view.bounds.size)
+                let startScene = StartScene(size: view.bounds.size)
                 
                 // Present the scene
-                view.presentScene(gameScene)
+                view.presentScene(startScene)
             }
             
             view.ignoresSiblingOrder = true
