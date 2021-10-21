@@ -1,4 +1,4 @@
-Blocos - SpriteKit Bircks Game
+Blocos - SpriteKit Bricks Game
 ==============================
 
 Summary
